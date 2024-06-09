@@ -7,10 +7,11 @@ class SimpleChatBot:
 
     def load_data(self, filepath):
         data = pd.read_csv(filepath)
-        questions = data['Q'].tolist()  # 질문열만 뽑아 파이썬 리스트로 저장
-        answers = data['A'].tolist()   # 답변열만 뽑아 파이썬 리스트로 저장
+        questions = data['Q'].tolist()  # csv파일에서 질문열 Q만 뽑아 파이썬 리스트로 저장
+        answers = data['A'].tolist()    # csv파일에서 답변열 A만 뽑아 파이썬 리스트로 저장
         return questions, answers
-
+    
+    
     def calc_distance(self,a, b):
         ''' 레벤슈타인 거리 계산하기 '''
         if a == b: return 0 # 같으면 0을 반환
@@ -19,7 +20,11 @@ class SimpleChatBot:
         if a == "": return b_len
         if b == "": return a_len
         # 2차원 표 (a_len+1, b_len+1) 준비하기 --- (※1)
-
+        #        서 울 시
+        #    [0, 1, 2, 3]
+        # 서 [1, 0, 1, 2]
+        # 울 [2, 1, 0, 1]
+        # 시 [3, 2, 1, 0] 
         matrix = [[] for i in range(a_len+1)] # 리스트 컴프리헨션을 사용하여 1차원 초기화
         for i in range(a_len+1): # 0으로 초기화
             matrix[i] = [0 for j in range(b_len+1)]  # 리스트 컴프리헨션을 사용하여 2차원 초기화
@@ -44,16 +49,17 @@ class SimpleChatBot:
                 ])
                 # print(matrix)
             # print(matrix,'----------끝')
-        return matrix[a_len][b_len]    
+        return matrix[a_len][b_len]   
 
     def find_best_answer(self, input_sentence):
-        L_distances = []
+        L_distances = []            # 입력된 질문과 학습 데이터질문의 레벤슈타인 거리 list 저장
         for question in self.questions:
-            distance = self.calc_distance(input_sentence, question)
+            distance = self.calc_distance(input_sentence, question)  # 입력된 질문과 학습 데이터질문의 레벤슈타인 거리 계산
             L_distances.append(distance)
-        best_match_index = L_distances.index(min(L_distances))
-        return self.answers[best_match_index], best_match_index # 인덱스 확인용
-        #return self.answers[best_match_index]
+        best_match_index = L_distances.index(min(L_distances))   #가장 작은 거리값의 인덱스를 가져옴
+        #return self.answers[best_match_index], best_match_index  # 인덱스 확인용
+        return self.answers[best_match_index]        
+        
 # CSV 파일 경로
 filepath = 'ChatbotData.csv'
 
@@ -68,5 +74,5 @@ while True:
         continue
     if input_sentence.lower() == '종료':
         break
-    response, _ = chatbot.find_best_answer(input_sentence)
+    response = chatbot.find_best_answer(input_sentence)
     print('Chatbot:', response)   
