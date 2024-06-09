@@ -11,7 +11,7 @@ class SimpleChatBot:
         answers = data['A'].tolist()   # 답변열만 뽑아 파이썬 리스트로 저장
         return questions, answers
 
-    def calc_distance(a, b):
+    def calc_distance(self,a, b):
         ''' 레벤슈타인 거리 계산하기 '''
         if a == b: return 0 # 같으면 0을 반환
         a_len = len(a) # a 길이
@@ -44,7 +44,29 @@ class SimpleChatBot:
                 ])
                 # print(matrix)
             # print(matrix,'----------끝')
-        return matrix[a_len][b_len]
-    
+        return matrix[a_len][b_len]    
 
     def find_best_answer(self, input_sentence):
+        L_distances = []
+        for question in self.questions:
+            distance = self.calc_distance(input_sentence, question)
+            L_distances.append(distance)
+        best_match_index = L_distances.index(min(L_distances))
+        return self.answers[best_match_index], best_match_index # 인덱스 확인용
+        #return self.answers[best_match_index]
+# CSV 파일 경로
+filepath = 'ChatbotData.csv'
+
+# 간단한 챗봇 인스턴스를 생성합니다.
+chatbot = SimpleChatBot(filepath)    
+
+# '종료'라는 단어가 입력될 때까지 챗봇과의 대화를 반복합니다.
+while True:
+    input_sentence = input('You: ')
+    if not input_sentence.strip():  # 질문이 입력되지 않으면 질문을 입력하라고 알려주고, 답변은 주지 않는다.
+        print('질문을 입력해주세요')
+        continue
+    if input_sentence.lower() == '종료':
+        break
+    response, _ = chatbot.find_best_answer(input_sentence)
+    print('Chatbot:', response)   
